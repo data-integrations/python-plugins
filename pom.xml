@@ -32,6 +32,9 @@
     <cdap.version>6.0.0-SNAPSHOT</cdap.version>
     <junit.version>4.11</junit.version>
     <jython.version>2.5.2</jython.version>
+    <py4j.version>0.10.8.1</py4j.version>
+    <commons.io.version>2.6</commons.io.version>
+    <awaitility.version>3.1.6</awaitility.version>
   </properties>
 
   <dependencies>
@@ -53,10 +56,26 @@
       <version>${jython.version}</version>
     </dependency>
     <dependency>
+      <groupId>net.sf.py4j</groupId>
+      <artifactId>py4j</artifactId>
+      <version>${py4j.version}</version>
+    </dependency>
+    <dependency>
       <groupId>co.cask.hydrator</groupId>
       <artifactId>hydrator-common</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>${commons.io.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.awaitility</groupId>
+      <artifactId>awaitility</artifactId>
+      <version>${awaitility.version}</version>
+    </dependency>
+
 
     <dependency>
       <groupId>co.cask.cdap</groupId>
@@ -241,6 +260,8 @@
           <instructions>
             <_exportcontents>
               co.cask.hydrator.python.transform.*;
+              co.cask.hydrator.common.*;
+              co.cask.hydrator.common.script.*;
             </_exportcontents>
             <Embed-Dependency>*;inline=false;scope=compile</Embed-Dependency>
             <Embed-Transitive>true</Embed-Transitive>
