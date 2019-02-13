@@ -19,21 +19,18 @@ limitations under the License.
 '''
 
 from threading import Thread
+from py4j import java_gateway
 from py4j.java_gateway import JavaGateway, GatewayParameters, CallbackServerParameters
 
 class PythonTransformTransportImpl(object):
-    def initialize(self, port):
-        self.gateway.gateway_parameters.port = port
+  def initialize(self, port):
+    self.gateway.gateway_parameters.port = port
 
-    def transform(self, record, emitter, context):
-        transform(record, emitter, context)
+  def transform(self, record, emitter, context):
+    transform(record, emitter, context)
 
-    def finish(self):
-        process = Thread(target=self.gateway.shutdown)
-        process.start()
-
-    class Java:
-        implements = ["co.cask.hydrator.plugin.transform.PythonTransformTransport"]
+  class Java:
+    implements = ["co.cask.hydrator.plugin.transform.PythonTransformTransport"]
 
 
 ${cdap.transform.function}
@@ -41,9 +38,14 @@ ${cdap.transform.function}
 transform_transport = PythonTransformTransportImpl()
 
 gateway = JavaGateway(
-    callback_server_parameters=CallbackServerParameters(port=0),
-    python_server_entry_point=transform_transport)
+  callback_server_parameters=CallbackServerParameters(port=0),
+  python_server_entry_point=transform_transport)
 transform_transport.gateway = gateway
 
 with open("port", "w") as fp:
   fp.write(str(gateway.get_callback_server().get_listening_port()))
+
+def on_server_connection_stopped(signal, sender, **params):
+  gateway.shutdown()
+
+java_gateway.server_connection_stopped.connect(on_server_connection_stopped)

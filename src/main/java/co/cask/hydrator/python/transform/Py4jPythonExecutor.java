@@ -168,14 +168,6 @@ public class Py4jPythonExecutor implements PythonExecutor {
 
   @Override
   public void destroy() {
-    try {
-      if (py4jTransport != null) {
-        py4jTransport.finish();
-      }
-    } catch (Exception e) {
-      LOGGER.warn("Cannot close python process.\n", e);
-    }
-
     if (gatewayServer != null) {
       gatewayServer.shutdown();
     }
