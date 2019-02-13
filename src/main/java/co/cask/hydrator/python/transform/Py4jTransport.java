@@ -40,9 +40,4 @@ public interface Py4jTransport {
    * @param scriptContext context containing information
    */
   void transform(Object record, Emitter<Map> emitter, ScriptContext scriptContext);
-
-  /**
-   * Close connection to jvm
-   */
-  void finish();
 }
