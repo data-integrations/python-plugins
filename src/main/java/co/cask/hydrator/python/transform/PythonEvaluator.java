@@ -41,6 +41,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -137,7 +142,10 @@ public class PythonEvaluator extends Transform<StructuredRecord, StructuredRecor
   }
 
   @Override
-  public void initialize(TransformContext context) throws IOException, InterruptedException {
+  public void initialize(TransformContext context) throws IOException, InterruptedException,
+    UnrecoverableKeyException, CertificateEncodingException, NoSuchAlgorithmException,
+    KeyStoreException, KeyManagementException {
+
     metrics = context.getMetrics();
     logger = LoggerFactory.getLogger(PythonEvaluator.class.getName() + " - Stage:" + context.getStageName());
 

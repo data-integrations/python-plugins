@@ -24,20 +24,30 @@ import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import py4j.CallbackClient;
 import py4j.GatewayServer;
 import py4j.Py4JException;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateEncodingException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 /**
  * Executes python code using py4j python library.
@@ -50,8 +60,13 @@ public class Py4jPythonExecutor implements PythonExecutor {
   private static final int PYTHON_PROCESS_PORT_FILE_CREATED_TIMEOUT = 120;
   private static final int PYTHON_PROCESS_STOP_TIMEOUT = 30;
   private static final int PYTHON_PROCESS_KILL_TIMEOUT = 10;
+  private static final int CERT_VALIDITY_DAYS = 90;
+
   private static final String USER_CODE_PLACEHOLDER = "\\$\\{cdap\\.transform\\.function\\}";
   private static final String PYTHONPATH_ENV_VARIABLE_NAME = "PYTHONPATH";
+  // in our case (generating via code) it does not make much sense to have a password for keystore
+  private static final String PASSWORD_STRING = "";
+
   private static final Logger LOGGER = LoggerFactory.getLogger(Py4jPythonExecutor.class);
 
   private final PythonEvaluator.Config config;
@@ -62,6 +77,7 @@ public class Py4jPythonExecutor implements PythonExecutor {
   private GatewayServer gatewayServer;
   private Py4jTransport py4jTransport;
   private File transformTempDir;
+  private KeyStore keyStore;
 
   public Py4jPythonExecutor(PythonEvaluator.Config config) {
     this.config = config;
@@ -75,7 +91,21 @@ public class Py4jPythonExecutor implements PythonExecutor {
     }
   }
 
-  private File prepareTempFiles() throws IOException {
+  private KeyStore generatePemFileAndKeyStore(String transformTempDirString) throws
+    UnrecoverableKeyException, CertificateEncodingException,
+    NoSuchAlgorithmException, KeyStoreException, IOException {
+
+    char[] password = PASSWORD_STRING.toCharArray();
+    KeyStore ks = KeyStores.generatedCertKeyStore(CERT_VALIDITY_DAYS, PASSWORD_STRING);
+
+    File pemFile = new File(transformTempDirString, "selfsigned.pem");
+    KeyStores.generatePemFileFromKeyStore(ks, PASSWORD_STRING, pemFile);
+
+    return ks;
+  }
+
+  private File prepareTempFiles() throws IOException, UnrecoverableKeyException,
+    CertificateEncodingException, NoSuchAlgorithmException, KeyStoreException {
     URL url = getClass().getResource("/pythonEvaluator.py");
     String scriptText = new String(Files.readAllBytes(Paths.get(url.getPath())), StandardCharsets.UTF_8);
     scriptText = scriptText.replaceAll(USER_CODE_PLACEHOLDER, config.getScript());
@@ -86,6 +116,8 @@ public class Py4jPythonExecutor implements PythonExecutor {
 
     String transformTempDirString = transformTempDirPath.normalize().toString();
     transformTempDir = new File(transformTempDirString);
+
+    keyStore = generatePemFileAndKeyStore(transformTempDirString);
 
     pythonProcessOutputFile = new File(transformTempDirString, "output.txt");
     FileUtils.touch(pythonProcessOutputFile);
@@ -101,7 +133,10 @@ public class Py4jPythonExecutor implements PythonExecutor {
   }
 
   @Override
-  public void initialize(ScriptContext scriptContext) throws IOException, InterruptedException {
+  public void initialize(ScriptContext scriptContext) throws IOException,
+    InterruptedException, UnrecoverableKeyException, CertificateEncodingException,
+    NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+
     File tempPythonFile = prepareTempFiles();
     File portFile = new File(transformTempDir, "port");
 
@@ -131,8 +166,29 @@ public class Py4jPythonExecutor implements PythonExecutor {
 
     LOGGER.debug("Python process port is: {}", pythonPort);
 
-    gatewayServer = new GatewayServer((Object) null, 0, pythonPort, 0, 0, (List) null);
+    SSLContext sslContext = SSLContext.getInstance("TLS");
+
+    KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+    kmf.init(keyStore, PASSWORD_STRING.toCharArray());
+
+
+    TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+    tmf.init(keyStore);
+
+    // setup the HTTPS context and parameters
+    sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+
+
+    gatewayServer = new GatewayServer((Object) null, 0,
+                                      InetAddress.getByName("localhost"), GatewayServer.DEFAULT_CONNECT_TIMEOUT,
+                                      GatewayServer.DEFAULT_READ_TIMEOUT, null,
+                                      new CallbackClient(pythonPort,
+                                                         InetAddress.getByName(CallbackClient.DEFAULT_ADDRESS),
+                                                         CallbackClient.DEFAULT_MIN_CONNECTION_TIME,
+                                                         TimeUnit.SECONDS, sslContext.getSocketFactory()),
+                                      sslContext.getServerSocketFactory());
     gatewayServer.start();
+
 
     Class[] entryClasses = new Class[]{Py4jTransport.class};
     py4jTransport = (Py4jTransport) gatewayServer.getPythonServerEntryPoint(entryClasses);
