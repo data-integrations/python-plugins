@@ -21,6 +21,11 @@ import co.cask.cdap.etl.api.Emitter;
 import co.cask.hydrator.common.script.ScriptContext;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateEncodingException;
 import java.util.Map;
 
 /**
@@ -34,7 +39,8 @@ public interface PythonExecutor {
    * @throws IOException
    * @throws InterruptedException
    */
-  void initialize(ScriptContext scriptContext) throws IOException, InterruptedException;
+  void initialize(ScriptContext scriptContext) throws IOException, InterruptedException, UnrecoverableKeyException,
+    CertificateEncodingException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException;
 
   /**
    * Run python transformation

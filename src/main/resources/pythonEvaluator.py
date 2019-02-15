@@ -18,6 +18,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '''
 
+import ssl
+
 from threading import Thread
 from py4j import java_gateway
 from py4j.java_gateway import JavaGateway, GatewayParameters, CallbackServerParameters
@@ -35,10 +37,27 @@ class PythonTransformTransportImpl(object):
 
 ${cdap.transform.function}
 
+
+key_file = "selfsigned.pem"
+
+client_ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+client_ssl_context.verify_mode = ssl.CERT_REQUIRED
+client_ssl_context.check_hostname = True
+client_ssl_context.load_verify_locations(cafile=key_file)
+
+server_ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+server_ssl_context.load_cert_chain(key_file, password='')
+
+# address must match cert, because we're checking hostnames
+gateway_parameters = GatewayParameters(
+  address='localhost',
+  ssl_context=client_ssl_context)
+
 transform_transport = PythonTransformTransportImpl()
 
 gateway = JavaGateway(
-  callback_server_parameters=CallbackServerParameters(port=0),
+  callback_server_parameters=CallbackServerParameters(port=0, ssl_context=server_ssl_context),
+  gateway_parameters=gateway_parameters,
   python_server_entry_point=transform_transport)
 transform_transport.gateway = gateway
 
