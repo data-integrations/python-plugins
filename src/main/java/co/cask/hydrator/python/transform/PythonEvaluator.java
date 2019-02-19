@@ -215,8 +215,15 @@ public class PythonEvaluator extends Transform<StructuredRecord, StructuredRecor
     } else {
       pipelineConfigurer.getStageConfigurer().setOutputSchema(pipelineConfigurer.getStageConfigurer().getInputSchema());
     }
-    // try evaluating the script to fail application creation if the script is invalid
-    init(null);
+    // try evaluating the script to fail application creation
+    // if the script is invalid (only possible for interpreted mode)
+    if (config.executionMode.equalsIgnoreCase(EXECUTION_MODE_INTERPRETED)) {
+      try {
+        new JythonPythonExecutor(config).initialize(null);
+      } catch (IOException | InterruptedException e) {
+        throw new RuntimeException("Could not compile script", e);
+      }
+    }
   }
 
   @Override
