@@ -32,7 +32,7 @@ class PythonTransformTransportImpl(object):
     transform(record, emitter, context)
 
   class Java:
-    implements = ["co.cask.hydrator.plugin.transform.PythonTransformTransport"]
+    implements = ["io.cdap.plugin.transform.PythonTransformTransport"]
 
 
 ${cdap.transform.function}

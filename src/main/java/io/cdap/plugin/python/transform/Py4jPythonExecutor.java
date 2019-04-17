@@ -14,11 +14,11 @@
  * the License.
  */
 
-package co.cask.hydrator.python.transform;
+package io.cdap.plugin.python.transform;
 
-import co.cask.cdap.api.data.format.StructuredRecord;
-import co.cask.cdap.etl.api.Emitter;
-import co.cask.hydrator.common.script.ScriptContext;
+import io.cdap.cdap.api.data.format.StructuredRecord;
+import io.cdap.cdap.etl.api.Emitter;
+import io.cdap.plugin.common.script.ScriptContext;
 import org.apache.commons.io.FileUtils;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;

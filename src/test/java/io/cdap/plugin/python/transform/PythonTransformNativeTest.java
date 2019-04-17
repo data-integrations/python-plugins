@@ -14,10 +14,10 @@
  * the License.
  */
 
-package co.cask.hydrator.python.transform;
+package io.cdap.plugin.python.transform;
 
-import co.cask.cdap.api.data.format.StructuredRecord;
 import com.google.common.collect.ImmutableMap;
+import io.cdap.cdap.api.data.format.StructuredRecord;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;

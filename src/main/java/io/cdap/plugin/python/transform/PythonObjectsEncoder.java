@@ -15,12 +15,12 @@
  */
 
 
-package co.cask.hydrator.python.transform;
+package io.cdap.plugin.python.transform;
 
-import co.cask.cdap.api.data.format.StructuredRecord;
-import co.cask.cdap.api.data.schema.Schema;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.cdap.cdap.api.data.format.StructuredRecord;
+import io.cdap.cdap.api.data.schema.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
