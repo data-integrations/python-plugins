@@ -14,7 +14,7 @@
  * the License.
  */
 
-package co.cask.hydrator.python.transform;
+package io.cdap.plugin.python.transform;
 
 public class PythonTransformInterpretedTest extends BasePythonTransformTest {
   protected String getExecutionMode() {

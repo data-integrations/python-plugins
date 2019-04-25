@@ -14,7 +14,7 @@
  * the License.
  */
 
-package co.cask.hydrator.python.transform;
+package io.cdap.plugin.python.transform;
 
 import org.apache.commons.lang.time.DateUtils;
 import sun.security.x509.AlgorithmId;
