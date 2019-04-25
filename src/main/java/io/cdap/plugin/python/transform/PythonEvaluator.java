@@ -14,29 +14,29 @@
  * the License.
  */
 
-package co.cask.hydrator.python.transform;
+package io.cdap.plugin.python.transform;
 
-import co.cask.cdap.api.annotation.Description;
-import co.cask.cdap.api.annotation.Macro;
-import co.cask.cdap.api.annotation.Name;
-import co.cask.cdap.api.annotation.Plugin;
-import co.cask.cdap.api.data.format.StructuredRecord;
-import co.cask.cdap.api.data.schema.Schema;
-import co.cask.cdap.api.plugin.PluginConfig;
-import co.cask.cdap.etl.api.Emitter;
-import co.cask.cdap.etl.api.InvalidEntry;
-import co.cask.cdap.etl.api.Lookup;
-import co.cask.cdap.etl.api.LookupProvider;
-import co.cask.cdap.etl.api.PipelineConfigurer;
-import co.cask.cdap.etl.api.StageMetrics;
-import co.cask.cdap.etl.api.StageSubmitterContext;
-import co.cask.cdap.etl.api.Transform;
-import co.cask.cdap.etl.api.TransformContext;
-import co.cask.cdap.etl.api.lineage.field.FieldOperation;
-import co.cask.cdap.etl.api.lineage.field.FieldTransformOperation;
-import co.cask.hydrator.common.SchemaValidator;
-import co.cask.hydrator.common.script.JavaTypeConverters;
-import co.cask.hydrator.common.script.ScriptContext;
+import io.cdap.cdap.api.annotation.Description;
+import io.cdap.cdap.api.annotation.Macro;
+import io.cdap.cdap.api.annotation.Name;
+import io.cdap.cdap.api.annotation.Plugin;
+import io.cdap.cdap.api.data.format.StructuredRecord;
+import io.cdap.cdap.api.data.schema.Schema;
+import io.cdap.cdap.api.plugin.PluginConfig;
+import io.cdap.cdap.etl.api.Emitter;
+import io.cdap.cdap.etl.api.InvalidEntry;
+import io.cdap.cdap.etl.api.Lookup;
+import io.cdap.cdap.etl.api.LookupProvider;
+import io.cdap.cdap.etl.api.PipelineConfigurer;
+import io.cdap.cdap.etl.api.StageMetrics;
+import io.cdap.cdap.etl.api.StageSubmitterContext;
+import io.cdap.cdap.etl.api.Transform;
+import io.cdap.cdap.etl.api.TransformContext;
+import io.cdap.cdap.etl.api.lineage.field.FieldOperation;
+import io.cdap.cdap.etl.api.lineage.field.FieldTransformOperation;
+import io.cdap.plugin.common.SchemaValidator;
+import io.cdap.plugin.common.script.JavaTypeConverters;
+import io.cdap.plugin.common.script.ScriptContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

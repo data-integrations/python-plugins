@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Copyright © 2019 Cask Data, Inc.
+  Copyright © 2019 CDAP
   Licensed under the Apache License, Version 2.0 (the "License"); you may not
   use this file except in compliance with the License. You may obtain a copy of
   the License at
@@ -19,7 +19,7 @@
 
 
   <name>Python plugins</name>
-  <groupId>co.cask.hydrator</groupId>
+  <groupId>io.cdap.plugin</groupId>
   <artifactId>python-plugins</artifactId>
   <version>2.2.0-SNAPSHOT</version>
   <packaging>jar</packaging>
@@ -30,6 +30,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- version properties -->
     <cdap.version>6.0.0-SNAPSHOT</cdap.version>
+    <hydrator.version>2.2.0-SNAPSHOT</hydrator.version>
     <junit.version>4.11</junit.version>
     <jython.version>2.5.2</jython.version>
     <py4j.version>0.10.8.1</py4j.version>
@@ -37,16 +38,26 @@
     <awaitility.version>3.1.6</awaitility.version>
     <commons.lang.version>2.6</commons.lang.version>
   </properties>
+  <repositories>
+    <repository>
+      <id>sonatype</id>
+      <url>https://oss.sonatype.org/content/groups/public</url>
+    </repository>
+    <repository>
+      <id>sonatype-snapshots</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+  </repositories>
 
   <dependencies>
     <dependency>
-      <groupId>co.cask.cdap</groupId>
+      <groupId>io.cdap.cdap</groupId>
       <artifactId>cdap-api</artifactId>
       <version>${cdap.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>co.cask.cdap</groupId>
+      <groupId>io.cdap.cdap</groupId>
       <artifactId>cdap-etl-api</artifactId>
       <version>${cdap.version}</version>
       <scope>provided</scope>
@@ -62,9 +73,9 @@
       <version>${py4j.version}</version>
     </dependency>
     <dependency>
-      <groupId>co.cask.hydrator</groupId>
+      <groupId>io.cdap.plugin</groupId>
       <artifactId>hydrator-common</artifactId>
-      <version>${project.version}</version>
+      <version>${hydrator.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -85,19 +96,19 @@
 
 
     <dependency>
-      <groupId>co.cask.cdap</groupId>
+      <groupId>io.cdap.cdap</groupId>
       <artifactId>cdap-etl-proto</artifactId>
       <version>${cdap.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>co.cask.cdap</groupId>
+      <groupId>io.cdap.cdap</groupId>
       <artifactId>hydrator-test</artifactId>
       <version>${cdap.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>co.cask.cdap</groupId>
+      <groupId>io.cdap.cdap</groupId>
       <artifactId>cdap-data-pipeline</artifactId>
       <version>${cdap.version}</version>
       <scope>test</scope>
@@ -116,13 +127,13 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>co.cask</groupId>
+          <groupId>io.cdap</groupId>
           <artifactId>cdap-maven-plugin</artifactId>
-          <version>1.0.1</version>
+          <version>1.1.0</version>
           <configuration>
             <cdapArtifacts>
-              <parent>system:cdap-data-pipeline[5.1.0-SNAPSHOT,7.0.0-SNAPSHOT)</parent>
-              <parent>system:cdap-data-streams[5.1.0-SNAPSHOT,7.0.0-SNAPSHOT)</parent>
+              <parent>system:cdap-data-pipeline[6.0.0-SNAPSHOT,7.0.0-SNAPSHOT)</parent>
+              <parent>system:cdap-data-streams[6.0.0-SNAPSHOT,7.0.0-SNAPSHOT)</parent>
             </cdapArtifacts>
           </configuration>
           <executions>
@@ -274,9 +285,9 @@
         <configuration>
           <instructions>
             <_exportcontents>
-              co.cask.hydrator.python.transform.*;
-              co.cask.hydrator.common.*;
-              co.cask.hydrator.common.script.*;
+              io.cdap.plugin.python.transform.*;
+              io.cdap.plugin.common.*;
+              io.cdap.plugin.common.script.*;
             </_exportcontents>
             <Embed-Dependency>*;inline=false;scope=compile</Embed-Dependency>
             <Embed-Transitive>true</Embed-Transitive>
@@ -293,7 +304,7 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>co.cask</groupId>
+        <groupId>io.cdap</groupId>
         <artifactId>cdap-maven-plugin</artifactId>
       </plugin>
     </plugins>
