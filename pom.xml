@@ -21,7 +21,7 @@
   <name>Python plugins</name>
   <groupId>co.cask.hydrator</groupId>
   <artifactId>python-plugins</artifactId>
-  <version>1.0</version>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
 
 
