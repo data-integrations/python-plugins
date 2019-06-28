@@ -16,12 +16,14 @@
 
 package io.cdap.plugin.python.transform;
 
+import com.google.common.base.Strings;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.etl.api.Emitter;
 import io.cdap.plugin.common.script.ScriptContext;
 import org.python.core.Py;
 import org.python.core.PyCode;
 import org.python.core.PyException;
+import org.python.core.PySyntaxError;
 import org.python.util.PythonInterpreter;
 
 import java.io.IOException;
@@ -58,7 +60,17 @@ public class JythonPythonExecutor implements PythonExecutor {
     String script = String.format("%s\ntransform(%s, %s, %s)",
                                   config.getScript(), INPUT_STRUCTURED_RECORD_VARIABLE_NAME,
                                   EMITTER_VARIABLE_NAME, CONTEXT_NAME);
-    compiledScript = interpreter.compile(script);
+    try {
+      compiledScript = interpreter.compile(script);
+    } catch (PySyntaxError e) {
+      if (Strings.isNullOrEmpty(e.getMessage())) {
+        throw new RuntimeException(
+          "Unknown syntax error occurred while interpreting python code. Please make sure syntax is correct.", e);
+      }
+      throw new RuntimeException(
+        String.format("Syntax error occurred while interpreting python code: '%s'" +
+                        "Please make sure syntax is correct.", e.getMessage()), e);
+    }
   }
 
   @Override
