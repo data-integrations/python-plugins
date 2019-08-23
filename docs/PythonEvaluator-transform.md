@@ -22,6 +22,7 @@ For example:
 will scale the ``'count'`` field of ``record`` by 1024.
 
 **Execution Mode:** How to execute the python code. Supported modes are:
+
 _Interpreted mode_:
 Python code is executed via jvm, hence C based libs (e.g. numpy) and Python3 syntax are not supported.
 
