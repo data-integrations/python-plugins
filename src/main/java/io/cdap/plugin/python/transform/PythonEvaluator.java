@@ -24,10 +24,12 @@ import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
 import io.cdap.cdap.api.plugin.PluginConfig;
 import io.cdap.cdap.etl.api.Emitter;
+import io.cdap.cdap.etl.api.FailureCollector;
 import io.cdap.cdap.etl.api.InvalidEntry;
 import io.cdap.cdap.etl.api.Lookup;
 import io.cdap.cdap.etl.api.LookupProvider;
 import io.cdap.cdap.etl.api.PipelineConfigurer;
+import io.cdap.cdap.etl.api.StageConfigurer;
 import io.cdap.cdap.etl.api.StageMetrics;
 import io.cdap.cdap.etl.api.StageSubmitterContext;
 import io.cdap.cdap.etl.api.Transform;
@@ -73,6 +75,9 @@ public class PythonEvaluator extends Transform<StructuredRecord, StructuredRecor
    * Configuration for the script transform.
    */
   public static class Config extends PluginConfig {
+    private static final String SCRIPT = "script";
+    private static final String SCHEMA = "schema";
+
     @Description("Python code defining how to transform one record into another. The script must implement a " +
       "function called 'transform', which takes as input a dictionary representing the input record, an emitter " +
       "object, and a context object (which contains CDAP metrics and logger). The emitter object can be used to emit " +
@@ -210,10 +215,17 @@ public class PythonEvaluator extends Transform<StructuredRecord, StructuredRecor
   @Override
   public void configurePipeline(PipelineConfigurer pipelineConfigurer) throws IllegalArgumentException {
     super.configurePipeline(pipelineConfigurer);
+    StageConfigurer stageConfigurer = pipelineConfigurer.getStageConfigurer();
+    FailureCollector collector = stageConfigurer.getFailureCollector();
+
     if (config.schema != null) {
-      pipelineConfigurer.getStageConfigurer().setOutputSchema(parseJson(config.schema));
+      try {
+        stageConfigurer.setOutputSchema(parseJson(config.schema));
+      } catch (Exception e) {
+        collector.addFailure(e.getMessage(), null).withStacktrace(e.getStackTrace()).withConfigProperty(Config.SCHEMA);
+      }
     } else {
-      pipelineConfigurer.getStageConfigurer().setOutputSchema(pipelineConfigurer.getStageConfigurer().getInputSchema());
+      stageConfigurer.setOutputSchema(stageConfigurer.getInputSchema());
     }
     // try evaluating the script to fail application creation
     // if the script is invalid (only possible for interpreted mode)
@@ -221,7 +233,8 @@ public class PythonEvaluator extends Transform<StructuredRecord, StructuredRecor
       try {
         new JythonPythonExecutor(config).initialize(null);
       } catch (IOException | InterruptedException e) {
-        throw new RuntimeException("Could not compile script", e);
+        collector.addFailure("Could not compile script: " + e.getMessage(), null)
+          .withStacktrace(e.getStackTrace()).withConfigProperty(Config.SCRIPT);
       }
     }
   }
