@@ -21,7 +21,7 @@
   <name>Python plugins</name>
   <groupId>io.cdap.plugin</groupId>
   <artifactId>python-plugins</artifactId>
-  <version>2.2.0</version>
+  <version>2.2.1</version>
   <packaging>jar</packaging>
 
 
@@ -29,8 +29,8 @@
     <surefire.redirectTestOutputToFile>true</surefire.redirectTestOutputToFile>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- version properties -->
-    <cdap.version>6.0.0-SNAPSHOT</cdap.version>
-    <hydrator.version>2.2.0-SNAPSHOT</hydrator.version>
+    <cdap.version>6.0.0</cdap.version>
+    <hydrator.version>2.2.0</hydrator.version>
     <junit.version>4.11</junit.version>
     <jython.version>2.5.2</jython.version>
     <py4j.version>0.10.8.1</py4j.version>
