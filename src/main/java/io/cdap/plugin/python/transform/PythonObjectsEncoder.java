@@ -24,8 +24,10 @@ import io.cdap.cdap.api.data.schema.Schema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +54,7 @@ public class PythonObjectsEncoder {
       case ENUM:
         break;
       case ARRAY:
-        return encodeArray((List) object, schema.getComponentSchema());
+        return encodeArray(object, schema.getComponentSchema());
       case MAP:
         Schema keySchema = schema.getMapSchema().getKey();
         Schema valSchema = schema.getMapSchema().getValue();
@@ -68,7 +70,7 @@ public class PythonObjectsEncoder {
     throw new IllegalArgumentException("Unable to encode object with schema " + schema + " Reason: unsupported type.");
   }
 
-  public static Object encodeRecord(StructuredRecord record, Schema schema) {
+  public static Map<String, Object> encodeRecord(StructuredRecord record, Schema schema) {
     Map<String, Object> map = new HashMap<>();
     for (Schema.Field field : schema.getFields()) {
       map.put(field.getName(), encode(record.get(field.getName()), field.getSchema()));
@@ -89,7 +91,7 @@ public class PythonObjectsEncoder {
     throw new RuntimeException("Unable to encode union with schema " + unionSchemas);
   }
 
-  public static Object encodeMap(Map<Object, Object> map, Schema keySchema, Schema valSchema) {
+  public static Map<Object, Object> encodeMap(Map<Object, Object> map, Schema keySchema, Schema valSchema) {
     Map<Object, Object> encoded = new HashMap<>();
     for (Map.Entry<Object, Object> entry : map.entrySet()) {
       encoded.put(encode(entry.getKey(), keySchema), encode(entry.getValue(), valSchema));
@@ -97,10 +99,20 @@ public class PythonObjectsEncoder {
     return encoded;
   }
 
-  public static Object encodeArray(List list, Schema componentSchema) {
-    List<Object> encoded = new ArrayList<>();
-    for (Object object : list) {
-      encoded.add(encode(object, componentSchema));
+  public static List<Object> encodeArray(Object list, Schema componentSchema) {
+    List<Object> encoded;
+    if (list instanceof Collection) {
+      Collection<Object> valuesList = (Collection<Object>) list;
+      encoded = new ArrayList<>(valuesList.size());
+      for (Object value : valuesList) {
+        encoded.add(encode(value, componentSchema));
+      }
+    } else {
+      int length = Array.getLength(list);
+      encoded = Lists.newArrayListWithCapacity(length);
+      for (int i = 0; i < length; i++) {
+        encoded.add(encode(Array.get(list, i), componentSchema));
+      }
     }
     return encoded;
   }
