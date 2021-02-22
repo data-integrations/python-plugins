@@ -27,8 +27,6 @@ import org.python.core.PySyntaxError;
 import org.python.util.PythonInterpreter;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Map;
 
 /**
@@ -83,17 +81,9 @@ public class JythonPythonExecutor implements PythonExecutor {
       Py.runCode(compiledScript, interpreter.getLocals(), interpreter.getLocals());
 
     } catch (PyException e) {
-      // Put stack trace as the exception message, because otherwise the information from PyException is lost.
-      // PyException only exposes the actual cause (Python stack trace) if printStackTrace() is called on it.
-      throw new IllegalArgumentException("Could not transform input.\n" + getStackTrace(e));
+      throw new IllegalArgumentException("Could not transform input.",
+                                         new Exception(e.traceback.dumpStack()));
     }
-  }
-
-  private String getStackTrace(Throwable throwable) {
-    StringWriter sw = new StringWriter();
-    PrintWriter pw = new PrintWriter(sw, true);
-    throwable.printStackTrace(pw);
-    return sw.toString();
   }
 
   @Override
