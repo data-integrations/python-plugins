@@ -374,4 +374,26 @@ public class PythonEvaluatorTest {
     Assert.assertTrue(Math.abs(2.71 * 2.71 + 3.14 * 3.14 * 3.14 - (Double) output.get("x")) < 0.000001);
     Assert.assertEquals(1, mockContext.getMockMetrics().getCount("script.transform.count"));
   }
+
+  @Test
+  public void testTransformError() throws Exception {
+    Schema outputSchema = Schema.recordOf(
+      "smallerSchema",
+      Schema.Field.of("x", Schema.of(Schema.Type.INT)));
+    // script has syntax error: input.inputField instead of input['intField']
+    PythonEvaluator.Config config = new PythonEvaluator.Config(
+      "def transform(input, emitter, context): emitter.emit({ 'x':input.intField})",
+      outputSchema.toString());
+    Transform<StructuredRecord, StructuredRecord> transform = new PythonEvaluator(config);
+    transform.initialize(new MockTransformContext());
+    MockEmitter<StructuredRecord> emitter = new MockEmitter<>();
+    boolean transformFailed = false;
+    try {
+      transform.transform(RECORD1, emitter);
+    } catch (IllegalArgumentException e) {
+      transformFailed = true;
+      Assert.assertEquals(e.getMessage(), "Could not transform input.");
+    }
+    Assert.assertTrue(transformFailed);
+  }
 }
