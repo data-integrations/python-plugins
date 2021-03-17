@@ -21,8 +21,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.api.data.schema.Schema;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Array;
 import java.math.BigInteger;
@@ -36,7 +34,6 @@ import java.util.Map;
  * Utility class, which has methods for encoding and decoding object between Java and Python.
  */
 public class PythonObjectsEncoder {
-  private static final Logger logger = LoggerFactory.getLogger(PythonObjectsEncoder.class.getName());
 
   public static Object encode(Object object, Schema schema) {
     Schema.Type type = schema.getType();
@@ -84,7 +81,6 @@ public class PythonObjectsEncoder {
         return encode(object, schema);
       } catch (Exception e) {
         // could be ok, just move on and try the next schema
-        logger.warn("Could not encode part of union with schema " + schema, e);
       }
     }
 
@@ -210,7 +206,6 @@ public class PythonObjectsEncoder {
         return decode(object, schema);
       } catch (Exception e) {
         // could be ok, just move on and try the next schema
-        logger.warn("Could not decode part of union with schema " + schema, e);
       }
     }
 
