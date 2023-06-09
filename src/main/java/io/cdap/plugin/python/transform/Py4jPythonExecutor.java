@@ -192,7 +192,12 @@ public class Py4jPythonExecutor implements PythonExecutor {
 
 
     Class[] entryClasses = new Class[]{Py4jTransport.class};
-    py4jTransport = (Py4jTransport) gatewayServer.getPythonServerEntryPoint(entryClasses);
+    LOGGER.error(Py4jTransport.class.getClassLoader().getClass().toString());
+    Object test = gatewayServer.getPythonServerEntryPoint(entryClasses);
+    LOGGER.error(test.getClass().toString());
+    LOGGER.error(test.getClass().getClassLoader().getClass().toString());
+
+    //py4jTransport = (Py4jTransport) gatewayServer.getPythonServerEntryPoint(entryClasses);
 
     LOGGER.debug("Waiting for py4j gateway to start...");
 
