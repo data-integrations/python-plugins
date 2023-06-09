@@ -202,7 +202,7 @@ public class Py4jPythonExecutor implements PythonExecutor {
     LOGGER.error(test.getClass().toString());
     LOGGER.error(test.getClass().getClassLoader().getClass().toString());
 
-    //py4jTransport = (Py4jTransport) gatewayServer.getPythonServerEntryPoint(entryClasses);
+    py4jTransport = (Py4jTransport) test;
 
     LOGGER.debug("Waiting for py4j gateway to start...");
 
