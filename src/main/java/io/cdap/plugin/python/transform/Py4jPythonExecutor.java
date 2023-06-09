@@ -194,6 +194,7 @@ public class Py4jPythonExecutor implements PythonExecutor {
     Class[] entryClasses = new Class[]{Py4jTransport.class};
     LOGGER.error(Py4jTransport.class.getClassLoader().getClass().toString());
     LOGGER.error(gatewayServer.getClass().getClassLoader().getClass().toString());
+    LOGGER.error(Thread.currentThread().getContextClassLoader().toString());
     Object test = gatewayServer.getPythonServerEntryPoint(entryClasses);
     LOGGER.error(test.getClass().toString());
     LOGGER.error(test.getClass().getClassLoader().getClass().toString());
