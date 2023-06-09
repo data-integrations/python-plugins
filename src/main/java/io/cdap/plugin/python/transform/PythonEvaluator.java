@@ -67,7 +67,7 @@ public class PythonEvaluator extends Transform<StructuredRecord, StructuredRecor
   private final Config config;
   private Schema schema;
   private StageMetrics metrics;
-  private Logger logger;
+  private Logger logger = LoggerFactory.getLogger(PythonEvaluator.class);
   private ScriptContext scriptContext;
   private PythonExecutor pythonExecutor;
 
@@ -150,6 +150,9 @@ public class PythonEvaluator extends Transform<StructuredRecord, StructuredRecor
   public void initialize(TransformContext context) throws IOException, InterruptedException,
     UnrecoverableKeyException, CertificateEncodingException, NoSuchAlgorithmException,
     KeyStoreException, KeyManagementException {
+
+    logger.error(ScriptContext.class.getClassLoader().getClass().toString());
+    logger.error(Py4jPythonExecutor.class.getClassLoader().getClass().toString());
 
     metrics = context.getMetrics();
     logger = LoggerFactory.getLogger(PythonEvaluator.class.getName() + " - Stage:" + context.getStageName());

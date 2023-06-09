@@ -20,6 +20,7 @@ import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.etl.api.Emitter;
 import io.cdap.plugin.common.script.ScriptContext;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.slf4j.Logger;
@@ -30,13 +31,12 @@ import py4j.Py4JException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -106,8 +106,9 @@ public class Py4jPythonExecutor implements PythonExecutor {
 
   private File prepareTempFiles() throws IOException, UnrecoverableKeyException,
     CertificateEncodingException, NoSuchAlgorithmException, KeyStoreException {
-    URL url = getClass().getResource("/pythonEvaluator.py");
-    String scriptText = new String(Files.readAllBytes(Paths.get(url.getPath())), StandardCharsets.UTF_8);
+    InputStream url = getClass().getResourceAsStream("/pythonEvaluator.py");
+    //String scriptText = new String(Files.readAllBytes(Paths.get(url.getPath())), StandardCharsets.UTF_8);
+    String scriptText = IOUtils.toString(url, StandardCharsets.UTF_8);
     scriptText = scriptText.replaceAll(USER_CODE_PLACEHOLDER, config.getScript());
 
     Path transformTempDirPath = Files.createTempDirectory("transform");
