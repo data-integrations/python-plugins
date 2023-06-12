@@ -193,8 +193,8 @@ public class Py4jPythonExecutor implements PythonExecutor {
 
     Class[] entryClasses = new Class[]{Py4jTransport.class};
     ClassLoader execClassLoader = Thread.currentThread().getContextClassLoader();
-    LOGGER.error(execClassLoader.getParent().toString());
-    Thread.currentThread().setContextClassLoader(gatewayServer.getClass().getClassLoader());
+    // LOGGER.error(execClassLoader.getParent().toString()); Returns NULL
+    // Thread.currentThread().setContextClassLoader(gatewayServer.getClass().getClassLoader());
     Object test = gatewayServer.getPythonServerEntryPoint(entryClasses);
     Thread.currentThread().setContextClassLoader(execClassLoader);
     LOGGER.error(test.getClass().toString());
