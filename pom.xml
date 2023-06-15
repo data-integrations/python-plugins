@@ -33,7 +33,7 @@
     <hydrator.version>2.12.0-SNAPSHOT</hydrator.version>
     <junit.version>4.11</junit.version>
     <jython.version>2.5.2</jython.version>
-    <py4j.version>0.10.8.1</py4j.version>
+    <py4j.version>0.10.9.7</py4j.version>
     <commons.io.version>2.6</commons.io.version>
     <awaitility.version>3.1.6</awaitility.version>
     <commons.lang.version>2.6</commons.lang.version>
