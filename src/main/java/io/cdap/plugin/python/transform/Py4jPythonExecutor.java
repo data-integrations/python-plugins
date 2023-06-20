@@ -144,7 +144,7 @@ public class Py4jPythonExecutor implements PythonExecutor {
     //ProcessBuilder ps = new ProcessBuilder(pythonBinary, tempPythonFile.getPath());
     String pythonEnv = "python3 -m venv .venv; source .venv/bin/activate";
     String pythonCommand = pythonBinary + " " + tempPythonFile.getPath();
-    ProcessBuilder ps = new ProcessBuilder("bash -c", pythonEnv, pythonCommand);
+    ProcessBuilder ps = new ProcessBuilder(pythonEnv, pythonCommand);
     Map<String, String> envs = ps.environment();
     envs.put(PYTHONPATH_ENV_VARIABLE_NAME, pythonPath);
     ps.directory(transformTempDir);
