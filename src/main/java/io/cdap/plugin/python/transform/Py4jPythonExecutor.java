@@ -142,7 +142,7 @@ public class Py4jPythonExecutor implements PythonExecutor {
     File portFile = new File(transformTempDir, "port");
 
     //ProcessBuilder ps = new ProcessBuilder(pythonBinary, tempPythonFile.getPath());
-    String pythonEnv = "python3 -m venv .venv; source .venv/bin/activate; pip3 install py4j";
+    String pythonEnv = "python3 -m venv .venv; source .venv/bin/activate; pip3 install --yes py4j";
     String pythonCommand = pythonBinary + " " + tempPythonFile.getPath();
     String finalComm = pythonEnv + "; " + pythonCommand;
     ProcessBuilder ps = new ProcessBuilder("bash", "-c", finalComm);
