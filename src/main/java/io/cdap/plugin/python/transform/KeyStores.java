@@ -17,14 +17,20 @@
 package io.cdap.plugin.python.transform;
 
 import org.apache.commons.lang.time.DateUtils;
+
 import sun.security.x509.AlgorithmId;
 import sun.security.x509.CertificateAlgorithmId;
+import sun.security.x509.CertificateExtensions;
 import sun.security.x509.CertificateIssuerName;
 import sun.security.x509.CertificateSerialNumber;
 import sun.security.x509.CertificateSubjectName;
 import sun.security.x509.CertificateValidity;
 import sun.security.x509.CertificateVersion;
 import sun.security.x509.CertificateX509Key;
+import sun.security.x509.GeneralName;
+import sun.security.x509.GeneralNames;
+import sun.security.x509.IPAddressName;
+import sun.security.x509.SubjectAlternativeNameExtension;
 import sun.security.x509.X500Name;
 import sun.security.x509.X509CertImpl;
 import sun.security.x509.X509CertInfo;
@@ -134,6 +140,10 @@ public final class KeyStores {
   private static X509Certificate getCertificate(String dn, KeyPair pair, int days, String algorithm) throws IOException,
     CertificateException, NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
     // Calculate the validity interval of the certificate
+    GeneralNames generalNames = new GeneralNames();
+    generalNames.add(new GeneralName(new IPAddressName("127.0.0.1")));
+    CertificateExtensions ext = new CertificateExtensions();
+    ext.set(SubjectAlternativeNameExtension.NAME, new SubjectAlternativeNameExtension(generalNames));
     Date from = new Date();
     Date to = DateUtils.addDays(from, days);
     CertificateValidity interval = new CertificateValidity(from, to);
@@ -143,8 +153,10 @@ public final class KeyStores {
     X500Name owner = new X500Name(dn);
     // Create an info objects with the provided information, which will be used to create the certificate
     X509CertInfo info = new X509CertInfo();
+    info.set(X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3));
     info.set(X509CertInfo.VALIDITY, interval);
     info.set(X509CertInfo.SERIAL_NUMBER, new CertificateSerialNumber(sn));
+    info.set(X509CertInfo.EXTENSIONS, ext);
     // In java 7, subject is of type CertificateSubjectName and issuer is of type CertificateIssuerName.
     // These were changed to X500Name in Java8. So looking at the field type before setting them.
     // This certificate will be self signed, hence the subject and the issuer are same.
@@ -165,7 +177,6 @@ public final class KeyStores {
       info.set(X509CertInfo.ISSUER, owner);
     }
     info.set(X509CertInfo.KEY, new CertificateX509Key(pair.getPublic()));
-    info.set(X509CertInfo.VERSION, new CertificateVersion(CertificateVersion.V3));
     AlgorithmId algo = new AlgorithmId(AlgorithmId.sha1WithRSAEncryption_oid);
     info.set(X509CertInfo.ALGORITHM_ID, new CertificateAlgorithmId(algo));
     // Create the certificate and sign it with the private key

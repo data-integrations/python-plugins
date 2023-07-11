@@ -20,6 +20,7 @@ import io.cdap.cdap.api.data.format.StructuredRecord;
 import io.cdap.cdap.etl.api.Emitter;
 import io.cdap.plugin.common.script.ScriptContext;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.awaitility.Awaitility;
 import org.awaitility.core.ConditionTimeoutException;
 import org.slf4j.Logger;
@@ -30,6 +31,7 @@ import py4j.Py4JException;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.URL;
@@ -106,8 +108,10 @@ public class Py4jPythonExecutor implements PythonExecutor {
 
   private File prepareTempFiles() throws IOException, UnrecoverableKeyException,
     CertificateEncodingException, NoSuchAlgorithmException, KeyStoreException {
-    URL url = getClass().getResource("/pythonEvaluator.py");
-    String scriptText = new String(Files.readAllBytes(Paths.get(url.getPath())), StandardCharsets.UTF_8);
+    String scriptText;
+    try (InputStream url = getClass().getResourceAsStream("/pythonEvaluator.py")) {
+      scriptText = IOUtils.toString(url, StandardCharsets.UTF_8);
+    }
     scriptText = scriptText.replaceAll(USER_CODE_PLACEHOLDER, config.getScript());
 
     Path transformTempDirPath = Files.createTempDirectory("transform");
@@ -191,8 +195,18 @@ public class Py4jPythonExecutor implements PythonExecutor {
 
 
     Class[] entryClasses = new Class[]{Py4jTransport.class};
-    py4jTransport = (Py4jTransport) gatewayServer.getPythonServerEntryPoint(entryClasses);
-
+    // gatewayServer.getPythonServerEntryPoint function uses the current thread classloader (Executor classloader)
+    // to load classes instead of using Plugin classloader which causes classloading issues.
+    // To avoid this we are setting the current thread classloader to Plugin classloader before calling
+    // gatewayServer.getPythonServerEntryPoint function and revert it back to Executor classloader.
+    ClassLoader exectorClassLoader = Thread.currentThread().getContextClassLoader();
+    ClassLoader pluginClassloader = Py4jTransport.class.getClassLoader();
+    Thread.currentThread().setContextClassLoader(pluginClassloader);
+    try {
+      py4jTransport = (Py4jTransport) gatewayServer.getPythonServerEntryPoint(entryClasses);
+    } finally {
+      Thread.currentThread().setContextClassLoader(exectorClassLoader);
+    }
     LOGGER.debug("Waiting for py4j gateway to start...");
 
     try {
