@@ -29,8 +29,8 @@
     <surefire.redirectTestOutputToFile>true</surefire.redirectTestOutputToFile>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- version properties -->
-    <cdap.version>6.1.0-SNAPSHOT</cdap.version>
-    <hydrator.version>2.3.0-SNAPSHOT</hydrator.version>
+    <cdap.version>6.10.0-SNAPSHOT</cdap.version>
+    <hydrator.version>2.12.0-SNAPSHOT</hydrator.version>
     <junit.version>4.11</junit.version>
     <jython.version>2.5.2</jython.version>
     <py4j.version>0.10.8.1</py4j.version>
@@ -109,7 +109,7 @@
     </dependency>
     <dependency>
       <groupId>io.cdap.cdap</groupId>
-      <artifactId>cdap-data-pipeline</artifactId>
+      <artifactId>cdap-data-pipeline3_2.12</artifactId>
       <version>${cdap.version}</version>
       <scope>test</scope>
     </dependency>

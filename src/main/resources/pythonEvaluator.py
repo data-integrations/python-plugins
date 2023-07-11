@@ -50,7 +50,7 @@ server_ssl_context.load_cert_chain(key_file, password='')
 
 # address must match cert, because we're checking hostnames
 gateway_parameters = GatewayParameters(
-  address='localhost',
+  address='127.0.0.1',
   ssl_context=client_ssl_context)
 
 transform_transport = PythonTransformTransportImpl()
