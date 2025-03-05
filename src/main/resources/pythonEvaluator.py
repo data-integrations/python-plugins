@@ -40,12 +40,12 @@ ${cdap.transform.function}
 
 key_file = "selfsigned.pem"
 
-client_ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+client_ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
 client_ssl_context.verify_mode = ssl.CERT_REQUIRED
 client_ssl_context.check_hostname = True
 client_ssl_context.load_verify_locations(cafile=key_file)
 
-server_ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+server_ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 server_ssl_context.load_cert_chain(key_file, password='')
 
 # address must match cert, because we're checking hostnames
