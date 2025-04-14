@@ -32,7 +32,7 @@
     <cdap.version>6.10.0-SNAPSHOT</cdap.version>
     <hydrator.version>2.12.0-SNAPSHOT</hydrator.version>
     <junit.version>4.11</junit.version>
-    <jython.version>2.5.2</jython.version>
+    <jython.version>2.7.2</jython.version>
     <py4j.version>0.10.8.1</py4j.version>
     <commons.io.version>2.6</commons.io.version>
     <awaitility.version>3.1.6</awaitility.version>
